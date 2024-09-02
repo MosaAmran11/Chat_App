@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: WhatsAppHome(),
     );
   }
 }
 
 class WhatsAppHome extends StatefulWidget {
+  const WhatsAppHome({super.key});
+
   @override
   _WhatsAppHomeState createState() => _WhatsAppHomeState();
 }
