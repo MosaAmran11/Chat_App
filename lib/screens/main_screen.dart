@@ -5,8 +5,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: WhatsAppHome(),
+    return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.green,
+      ),
+      home: const WhatsAppHome(),
     );
   }
 }
@@ -21,6 +25,9 @@ class WhatsAppHome extends StatefulWidget {
 class _WhatsAppHomeState extends State<WhatsAppHome>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late int currentPageIndex = 0;
+  NavigationDestinationLabelBehavior labelBehavior =
+      NavigationDestinationLabelBehavior.alwaysShow;
 
   @override
   void initState() {
@@ -34,64 +41,87 @@ class _WhatsAppHomeState extends State<WhatsAppHome>
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
+        title: const Text(
           "WhatsApp",
-          style: TextStyle(color: Colors.green),
+          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
         ),
-        actions: [
+        actions: const [
           Icon(Icons.camera_alt, color: Colors.black54),
           SizedBox(width: 20),
           Icon(Icons.search, color: Colors.black54),
           SizedBox(width: 20),
           Icon(Icons.more_vert, color: Colors.black54),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          // labelColor: Colors.green,
-          // unselectedLabelColor: Colors.black54,
-          // indicatorColor: Colors.green,
-          tabs: [
-            Tab(text: "All"),
-            Tab(text: "Unread"),
-            Tab(text: "Groups"),
-            Tab(
-              text: "Calls",
-            )
-          ],
-        ),
+        // bottom: TabBar(
+        //   controller: _tabController,
+        //   // labelColor: Colors.green,
+        //   // unselectedLabelColor: Colors.black54,
+        //   // indicatorColor: Colors.green,
+        //   tabs: [
+        //     Tab(text: "All"),
+        //     Tab(text: "Unread"),
+        //     Tab(text: "Groups"),
+        //     Tab(
+        //       text: "Calls",
+        //     )
+        //   ],
+        // ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          buildChatsList(),
-          buildUnreadList(),
-          buildGroupsList(),
-          buildCallsList(),
-        ],
-      ),
+        children: <Widget>[
+        buildChatsList(),
+        buildUpdateList(),
+        buildCommunitiesList(),
+        buildCallsList(),
+      ],),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        child: Icon(Icons.message),
         backgroundColor: Colors.green,
+        child: const Icon(Icons.message, color: Colors.white,),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tabController.index,
-        onTap: (index) {
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tabController.index,
+        labelBehavior: labelBehavior,
+        onDestinationSelected: (int index){
           setState(() {
             _tabController.index = index;
           });
         },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chats"),
-          BottomNavigationBarItem(icon: Icon(Icons.update), label: "Updates"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.groups), label: "Communities"),
-          BottomNavigationBarItem(icon: Icon(Icons.call), label: "Calls"),
+        destinations: const <Widget>[
+          NavigationDestination(
+              selectedIcon: Icon(Icons.chat),
+              icon: Icon(Icons.chat_outlined),
+              label: "Chats"),
+          NavigationDestination(
+              selectedIcon: Icon(Icons.update),
+              icon: Icon(Icons.update_outlined), label: "Updates"),
+          NavigationDestination(
+              selectedIcon: Icon(Icons.groups),
+              icon: Icon(Icons.groups_outlined), label: "Communities"),
+          NavigationDestination(
+              selectedIcon: Icon(Icons.call),
+              icon: Icon(Icons.call_outlined), label: "Calls")
         ],
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black54,
-        type: BottomNavigationBarType.fixed,
       ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: _tabController.index,
+      //   onTap: (index) {
+      //     setState(() {
+      //       _tabController.index = index;
+      //     });
+      //   },
+      //   items: [
+      //     BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chats"),
+      //     BottomNavigationBarItem(icon: Icon(Icons.update), label: "Updates"),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.groups), label: "Communities"),
+      //     BottomNavigationBarItem(icon: Icon(Icons.call), label: "Calls"),
+      //   ],
+      //   selectedItemColor: Colors.green,
+      //   unselectedItemColor: Colors.black54,
+      //   type: BottomNavigationBarType.fixed,
+      // ),
     );
   }
 
@@ -119,7 +149,7 @@ class _WhatsAppHomeState extends State<WhatsAppHome>
           newMessage: true,
         ),
         buildChatItem("Cristiano Alves",
-            "pls tell me you follow SingleCatClub...", "Yesterday",
+            "pls tell me you follow SingleCatClub. ", "Yesterday",
             sent: true),
         buildChatItem(
           "The Hendricks",
@@ -133,16 +163,22 @@ class _WhatsAppHomeState extends State<WhatsAppHome>
   Widget buildChatItem(String name, String message, String time,
       {bool pinned = false, bool sent = false, bool newMessage = false}) {
     return ListTile(
-      leading: CircleAvatar(
+      leading: const CircleAvatar(
         backgroundImage: NetworkImage(
             'https://lh3.googleusercontent.com/a/ACg8ocKpscRADdRviAd--l9ulwzFp51lb1KrKF5c_qwE6mHK8FUFDxO3=s360-c-no'), // Replace with actual image assets or network image
       ),
       title: Text(name),
       subtitle: Row(
         children: [
-          if (sent) Icon(Icons.check, size: 16, color: Colors.green),
-          if (sent)SizedBox(width: 4),
-          Text(message, style: TextStyle(color: Colors.black54),),
+          if (sent) const Icon(Icons.check, size: 16, color: Colors.green),
+          if (sent) const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.black54),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       trailing: Column(
@@ -150,21 +186,27 @@ class _WhatsAppHomeState extends State<WhatsAppHome>
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!newMessage)
-            Text(time, style: TextStyle(fontSize: 12, color: Colors.grey))
+            Text(time, style: const TextStyle(fontSize: 12, color: Colors.grey))
           else
-            Text(time, style: TextStyle(fontSize: 12, color: Colors.green)),
+            Text(time, style: const TextStyle(fontSize: 12, color: Colors.green)),
           if (newMessage)
             Container(
               height: 20,
               width: 20,
               decoration:
-              BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-              child: Center(
-                child: Text('1', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),),
+                  const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+              child: const Center(
+                child: Text(
+                  '1',
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
             ),
           if (pinned)
-            Icon(
+            const Icon(
               Icons.push_pin,
               size: 14,
               color: Colors.grey,
@@ -174,18 +216,15 @@ class _WhatsAppHomeState extends State<WhatsAppHome>
     );
   }
 
-  Widget buildUnreadList() {
-    // Implementation similar to buildChatsList with unread-specific logic
-    return Center(child: Text("Unread Messages"));
+  Widget buildUpdateList() {
+    return const Center(child: Text("Updates"));
   }
 
-  Widget buildGroupsList() {
-    // Implementation similar to buildChatsList with group-specific logic
-    return Center(child: Text("Groups"));
+  Widget buildCommunitiesList() {
+    return const Center(child: Text("Communities"));
   }
 
   Widget buildCallsList() {
-    // Implementation similar to buildChatsList with group-specific logic
-    return Center(child: Text("Calls"));
+    return const Center(child: Text("Calls"));
   }
 }
